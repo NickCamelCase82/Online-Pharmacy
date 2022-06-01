@@ -63,13 +63,14 @@ registrRoute.post("/auth", async (req, res) => {
     return res.redirect("/admin");
   } else {
     return res.send("Пожалуйста проверьте логин и пароль!");
+  }
 
-  if (user && await bcrypt.compare(password, user.password)) {
+  if (user && (await bcrypt.compare(password, user.password))) {
     // console.log('pass', await bcrypt.compare(password, user.password));
     req.session.user = user;
     req.session.isAuthorized = true;
     // console.log('req.session.user', req.session.user);
-    return res.redirect('/');
+    return res.redirect("/");
   }
 });
 // ------------------------------
@@ -80,24 +81,29 @@ registrRoute.get(
 );
 
 registrRoute.get(
-
   "/google/callback",
-  passport.authenticate("google", {
-    successRedirect: "/protected",
-    failureRedirect: "/failure",
-  })
-  '/google/callback',
-  passport.authenticate('google', {
-    // successRedirect: '/protected',
-    failureRedirect: '/failure',
-  }),
-  // passport.authenticate('local', { failureRedirect: '/login', failureMessage: true }),
-  (req, res) => {
-    // req.session.user = user;
-    req.session.isAuthorized = true;
-    // console.log('req.session.user', req.session.user);
-    return res.redirect('/');
-  },
+  passport.authenticate(
+    "google",
+    {
+      successRedirect: "/protected",
+      failureRedirect: "/failure",
+    },
+    "/google/callback",
+    passport.authenticate(
+      "google",
+      {
+        // successRedirect: '/protected',
+        failureRedirect: "/failure",
+      },
+      // passport.authenticate('local', { failureRedirect: '/login', failureMessage: true }),
+      (req, res) => {
+        // req.session.user = user;
+        req.session.isAuthorized = true;
+        // console.log('req.session.user', req.session.user);
+        return res.redirect("/");
+      }
+    )
+  )
 );
 
 registrRoute.get("/failure", (req, res) => res.send("Something wrong"));
